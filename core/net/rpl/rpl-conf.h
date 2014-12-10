@@ -81,6 +81,14 @@
  * This value decides if this node must stay as a leaf or not
  * as allowed by draft-ietf-roll-rpl-19#section-8.5
  */
+/*FIXME:652 change: Mobility status of a node*/
+#define RPL_NODE_MOBILE 1
+
+/*FIXME: 652 change: Global parameter to enable/disable dynamic DIS*/
+#ifndef RPL_DYNAMIC_DIS
+#define RPL_DYNAMIC_DIS 1
+#endif
+
 #ifdef RPL_CONF_LEAF_ONLY
 #define RPL_LEAF_ONLY RPL_CONF_LEAF_ONLY
 #else

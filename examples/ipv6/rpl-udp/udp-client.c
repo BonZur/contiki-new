@@ -39,6 +39,8 @@
 #endif
 #include <stdio.h>
 #include <string.h>
+/*FIXME: 652 code change*/
+#include "powertrace.h"
 
 #define UDP_CLIENT_PORT 8765
 #define UDP_SERVER_PORT 5678
@@ -49,7 +51,7 @@
 #include "net/ip/uip-debug.h"
 
 #ifndef PERIOD
-#define PERIOD 60
+#define PERIOD 1
 #endif
 
 #define START_INTERVAL		(15 * CLOCK_SECOND)
@@ -152,6 +154,9 @@ PROCESS_THREAD(udp_client_process, ev, data)
 #endif
 
   PROCESS_BEGIN();
+
+/*FIXME:Code change 652*/
+  powertrace_start(CLOCK_SECOND * 2);
 
   PROCESS_PAUSE();
 

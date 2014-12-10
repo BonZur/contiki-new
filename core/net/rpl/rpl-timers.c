@@ -59,6 +59,12 @@ static void handle_dio_timer(void *ptr);
 
 static uint16_t next_dis;
 
+/*TODO: Gopi's change*/
+#if RPL_DYNAMIC_DIS
+extern uint16_t RPL_DIS_PERIOD;
+#endif
+
+
 /* dio_send_ok is true if the node is ready to send DIOs */
 static uint8_t dio_send_ok;
 
@@ -72,7 +78,12 @@ handle_periodic_timer(void *ptr)
   /* handle DIS */
 #if RPL_DIS_SEND
   next_dis++;
+#if RPL_DYNAMIC_DIS
+/*FIXME:652 : Change this logic, to send DIS messages in a more efficient way*/
+  if(rpl_get_any_dag() == NULL && next_dis >= RPL_DIS_PERIOD) {
+#else
   if(rpl_get_any_dag() == NULL && next_dis >= RPL_DIS_INTERVAL) {
+#endif
     next_dis = 0;
     dis_output(NULL);
   }

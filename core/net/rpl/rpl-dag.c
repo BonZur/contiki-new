@@ -72,6 +72,24 @@ static rpl_of_t * const objective_functions[] = {&RPL_OF};
 #define RPL_GROUNDED                    RPL_CONF_GROUNDED
 #endif /* !RPL_CONF_GROUNDED */
 
+/*FIXME:652 change*/
+
+#if RPL_DYNAMIC_DIS
+uint8_t RPL_DIS_PERIOD = 25;
+/* The number of times that PP(prefrred parent) must change so that DIS = DIS/2 */
+uint8_t  PP_CHANGE_DOWN_DIS = 2;
+/*The number of times that PP(Preferred parent) must change so that DIS = DIS*2 */
+uint8_t PP_SAME_UP_DIS = 5;
+uint8_t DIS_PERIOD_MIN = 3;
+uint8_t DIS_PERIOD_MAX = 60;
+
+/* Counters to support Dynamic DIS management*/
+static uint16_t counter_pp_changed = 0;
+static uint16_t counter_pp_same = 0;
+#endif
+
+uint8_t parent_nodeid = 0;
+
 /*---------------------------------------------------------------------------*/
 /* Per-parent RPL information */
 NBR_TABLE(rpl_parent_t, rpl_parents);
@@ -128,21 +146,27 @@ rpl_get_parent_ipaddr(rpl_parent_t *p)
   return uip_ds6_nbr_ipaddr_from_lladdr((uip_lladdr_t *)lladdr);
 }
 /*---------------------------------------------------------------------------*/
+#define NODE_ID_FROM_ADDR(addr) ((uint8_t *)addr)[15]
 static void
 rpl_set_preferred_parent(rpl_dag_t *dag, rpl_parent_t *p)
 {
   if(dag != NULL && dag->preferred_parent != p) {
     PRINTF("RPL: rpl_set_preferred_parent ");
+    printf("RPL: rpl_set_preferred_parent ");
     if(p != NULL) {
       PRINT6ADDR(rpl_get_parent_ipaddr(p));
     } else {
       PRINTF("NULL");
+      printf("NULL");
     }
     PRINTF(" used to be ");
+    printf(" used to be ");
     if(dag->preferred_parent != NULL) {
       PRINT6ADDR(rpl_get_parent_ipaddr(dag->preferred_parent));
+      printf("%d", NODE_ID_FROM_ADDR(rpl_get_parent_ipaddr(dag->preferred_parent)));
     } else {
       PRINTF("NULL");
+      printf("NULL\n");
     }
     PRINTF("\n");
 
@@ -151,8 +175,36 @@ rpl_set_preferred_parent(rpl_dag_t *dag, rpl_parent_t *p)
     nbr_table_unlock(rpl_parents, dag->preferred_parent);
     nbr_table_lock(rpl_parents, p);
     dag->preferred_parent = p;
+#if RPL_DYNAMIC_DIS
+    if(dag != NULL && dag->preferred_parent != p) {
+        counter_pp_changed++;
+        if((RPL_DIS_PERIOD >= 2*DIS_PERIOD_MIN) && (counter_pp_changed >= PP_CHANGE_DOWN_DIS)) {
+                printf("DYNAMICRPL: DIS dynamic period is reduced to half : From %d to %d\n",RPL_DIS_PERIOD,RPL_DIS_PERIOD/2);
+                RPL_DIS_PERIOD = RPL_DIS_PERIOD/2;
+                counter_pp_changed = 0;
+        }
+    }
+    parent_nodeid = NODE_ID_FROM_ADDR(rpl_get_parent_ipaddr(p));
+    /* Gopi's change: Logging purpose*/
+    printf("DYNAMICRPL: Parent selected with  Rank %d, Nodeid %d and mobility_status %s\n",p->rank, parent_nodeid, p->mobile_node ? "Mobile" : "Static");
+#endif
+  } else {
+#if RPL_DYNAMIC_DIS
+    if(dag != NULL && dag->preferred_parent == p) {
+        counter_pp_same++;
+        if((2*RPL_DIS_PERIOD <= DIS_PERIOD_MAX) && (counter_pp_same >= PP_SAME_UP_DIS)) {
+                RPL_DIS_PERIOD = RPL_DIS_PERIOD*2;
+                printf("DYNAMICRPL: DIS dynamic period is doubled to %d\n",RPL_DIS_PERIOD);
+                counter_pp_same = 0;
+        }
+    }
+    parent_nodeid = NODE_ID_FROM_ADDR(rpl_get_parent_ipaddr(p));
+    /* Gopi's change: Logging purpose*/
+    printf("DYNAMICRPL: Parent selected with  Rank %d, Nodeid %d and mobility_status %s\n",p->rank, parent_nodeid, p->mobile_node ? "Mobile" : "Static");
+#endif
   }
 }
+
 /*---------------------------------------------------------------------------*/
 /* Greater-than function for the lollipop counter.                      */
 /*---------------------------------------------------------------------------*/
@@ -570,6 +622,9 @@ rpl_add_parent(rpl_dag_t *dag, rpl_dio_t *dio, uip_ipaddr_t *addr)
       p->dag = dag;
       p->rank = dio->rank;
       p->dtsn = dio->dtsn;
+#if RPL_DYNAMIC_DIS
+      p->mobile_node = dio->mobile_node;
+#endif
       p->link_metric = RPL_INIT_LINK_METRIC * RPL_DAG_MC_ETX_DIVISOR;
 #if RPL_DAG_MC != RPL_DAG_MC_NONE
       memcpy(&p->mc, &dio->mc, sizeof(p->mc));

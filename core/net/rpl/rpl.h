@@ -117,6 +117,9 @@ struct rpl_parent {
   uint16_t link_metric;
   uint8_t dtsn;
   uint8_t flags;
+#if RPL_DYNAMIC_DIS
+  uint8_t mobile_node;
+#endif
 };
 typedef struct rpl_parent rpl_parent_t;
 /*---------------------------------------------------------------------------*/

@@ -40,6 +40,9 @@
 #include <string.h>
 #include <ctype.h>
 
+/*FIXME:652 code change*/
+#include "powertrace.h"
+
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
@@ -102,6 +105,9 @@ PROCESS_THREAD(udp_server_process, ev, data)
   struct uip_ds6_addr *root_if;
 
   PROCESS_BEGIN();
+
+  /*FIXME:652 code change*/
+  powertrace_start(CLOCK_SECOND * 2);
 
   PROCESS_PAUSE();
 

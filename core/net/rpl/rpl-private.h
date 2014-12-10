@@ -87,6 +87,9 @@
 #define RPL_OPTION_SOLICITED_INFO        7
 #define RPL_OPTION_PREFIX_INFO           8
 #define RPL_OPTION_TARGET_DESC           9
+/*FIXME:652 change to add more options*/
+#define RPL_OPTION_NODE_MOBILITY	 10
+#define RPL_OPTION_NODE_PARENT_ID	 11
 
 #define RPL_DAO_K_FLAG                   0x80 /* DAO ACK requested */
 #define RPL_DAO_D_FLAG                   0x40 /* DODAG ID present */
@@ -230,6 +233,11 @@ struct rpl_dio {
   rpl_prefix_t destination_prefix;
   rpl_prefix_t prefix_info;
   struct rpl_metric_container mc;
+/* TODO: Gopi's change: Variables to store the mobility status and parent node id of the DIO message sender*/
+#if RPL_DYNAMIC_DIS
+  uint8_t mobile_node;
+#endif
+  uint8_t parent_nodeid;
 };
 typedef struct rpl_dio rpl_dio_t;
 
