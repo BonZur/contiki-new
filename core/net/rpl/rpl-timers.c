@@ -59,7 +59,7 @@ static void handle_dio_timer(void *ptr);
 
 static uint16_t next_dis;
 
-/*TODO: Gopi's change*/
+/*TODO: 652's change*/
 #if RPL_DYNAMIC_DIS
 extern uint16_t RPL_DIS_PERIOD;
 #endif

@@ -420,7 +420,7 @@ dio_input(void)
       #endif
       break;
    case RPL_OPTION_NODE_PARENT_ID:
-      /* Gopi's change: Change the copy line once the length of the parent id variable is fixed*/
+      /* 652's change: Change the copy line once the length of the parent id variable is fixed*/
       dio.parent_nodeid = buffer[i+2];
       #if RPL_DYNAMIC_DIS
       printf("RPL: Received a DIO from a %s node whose parent ID is %d\n",dio.mobile_node ? "Mobile" : "Static", dio.parent_nodeid);
@@ -566,18 +566,18 @@ dio_output(rpl_instance_t *instance, uip_ipaddr_t *uc_addr)
   }
 
 #if RPL_DYNAMIC_DIS
-  /*TODO:Gopi's code change to add Mobility information as an option*/
+  /*TODO:652's code change to add Mobility information as an option*/
   buffer[pos++] = RPL_OPTION_NODE_MOBILITY;
   buffer[pos++] = 1;
   buffer[pos++] = RPL_NODE_MOBILE;
 #endif
 
-  /* TODO: Gopi's change: to send parent's node id in DIO message.
+  /* TODO: 652's change: to send parent's node id in DIO message.
      A global variable is used to store the preferred_parent's node id or FIXME:*/
   buffer[pos++] = RPL_OPTION_NODE_PARENT_ID;
   buffer[pos++] = 1;
   buffer[pos++] = parent_nodeid;
-  /*TODO: Gopi's logging purpose, remove this*/
+  /*TODO: 652's logging purpose, remove this*/
   printf("RPL: Sending a DIO with parent node id %d \n",parent_nodeid);
 
 #if RPL_LEAF_ONLY

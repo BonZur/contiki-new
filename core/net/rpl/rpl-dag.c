@@ -185,7 +185,7 @@ rpl_set_preferred_parent(rpl_dag_t *dag, rpl_parent_t *p)
         }
     }
     parent_nodeid = NODE_ID_FROM_ADDR(rpl_get_parent_ipaddr(p));
-    /* Gopi's change: Logging purpose*/
+    /* 652's change: Logging purpose*/
     printf("DYNAMICRPL: Parent selected with  Rank %d, Nodeid %d and mobility_status %s\n",p->rank, parent_nodeid, p->mobile_node ? "Mobile" : "Static");
 #endif
   } else {
@@ -199,7 +199,7 @@ rpl_set_preferred_parent(rpl_dag_t *dag, rpl_parent_t *p)
         }
     }
     parent_nodeid = NODE_ID_FROM_ADDR(rpl_get_parent_ipaddr(p));
-    /* Gopi's change: Logging purpose*/
+    /* 652's change: Logging purpose*/
     printf("DYNAMICRPL: Parent selected with  Rank %d, Nodeid %d and mobility_status %s\n",p->rank, parent_nodeid, p->mobile_node ? "Mobile" : "Static");
 #endif
   }
